@@ -13,22 +13,29 @@ const create = async ({ image, files }) => {
   const parentPrefix = path.relative(process.cwd(), commonParentDir)+path.sep
   const fileMap = {}
   
-  // get *all the files, recursively
-  const allFiles = files.slice(0)
+  // get *all* the files, recursively
+  let allFiles = files.slice(0)
   await Promise.all(files.map(async f => {
     const matches = await glob(`${f}/**`)
     matches.forEach(m => {
       if (!allFiles.includes(m)) allFiles.push(m)
    })
   }))
-  
-  await Promise.all(allFiles.map(async f => {
-    if (fs.lstatSync(f).isDirectory()) return
-    console.log("reading", f)
-    const fileData = await fs.readFile(f)
-    fileMap[f.slice(parentPrefix.length)] = fileData
-  }))
-  return powfile.create({ image: imageData, files: fileMap }) 
+  allFiles = allFiles.filter(f => !fs.lstatSync(f).isDirectory())
+
+  // if it's a single file, just pack it
+  if (allFiles.length === 1) {
+    const f = allFiles[0]
+    const data = await fs.readFile(f)
+    return powfile.create({ image: imageData, data, contentType: mime.getType(f) })
+  } else {
+    await Promise.all(allFiles.map(async f => {
+      console.log("reading", f)
+      const fileData = await fs.readFile(f)
+      fileMap[f.slice(parentPrefix.length)] = fileData
+    }))
+    return powfile.create({ image: imageData, files: fileMap }) 
+  }
 }
 
 const extract = async ({ image, dir='.' }) => {
@@ -36,9 +43,13 @@ const extract = async ({ image, dir='.' }) => {
   const imageData = await fs.readFile(image)
   const extracted = await powfile.parse(imageData, { unzip: true })
   if (extracted instanceof Buffer) {
-    console.log("extracted thing is a buffer", typeof extracted)
-    const { headers, bodyData } = parseResponse(extracted)
-    await fs.writeFile(`index.${mime.getExtension(headers['content-type'])}`)
+    const { headers, bodyData } = parseResponse(extracted, { decodeContentEncoding: true })
+    const ext = mime.getExtension(headers['content-type'])
+    const outputFilename = `index.${ext}`
+    console.log("extracting", outputFilename)
+    const outputPath = path.join(dir, outputFilename)
+    await fs.mkdirp(path.dirname(outputPath))
+    await fs.writeFile(outputPath, bodyData)
   } else {
     extracted.forEach(async filepath => {
       if (!filepath.match(/\/$/)) {
