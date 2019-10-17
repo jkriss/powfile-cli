@@ -1,0 +1,21 @@
+{
+  "name": "powfile-cli",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "powfile": "cli.js"
+  },
+  "author": "Jesse Kriss <jesse@jklabs.net>",
+  "license": "ISC",
+  "dependencies": {
+    "commondir": "^1.0.1",
+    "fs-extra": "^8.1.0",
+    "glob": "^7.1.4",
+    "glob-promise": "^3.4.0",
+    "mime": "^2.4.4",
+    "parse-raw-http": "0.0.1",
+    "powfile": "0.0.1",
+    "yargs": "^14.2.0"
+  }
+}
