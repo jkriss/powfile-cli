@@ -2,7 +2,7 @@ const powfile = require('powfile')
 const fs = require('fs-extra')
 const path = require('path')
 const commondir = require('commondir')
-const mime = require('mime')
+const mime = require('mime/lite')
 const glob = require('glob-promise')
 const { parseResponse } = require('parse-raw-http').parseResponse
 
@@ -38,10 +38,10 @@ const create = async ({ image, files }) => {
   }
 }
 
-const extract = async ({ image, dir='.' }) => {
+const extract = async ({ image, dir='.', unzip=true }) => {
   await fs.mkdirp(dir)
   const imageData = await fs.readFile(image)
-  const extracted = await powfile.parse(imageData, { unzip: true })
+  const extracted = await powfile.parse(imageData, { unzip })
   if (extracted instanceof Buffer) {
     const { headers, bodyData } = parseResponse(extracted, { decodeContentEncoding: true })
     const ext = mime.getExtension(headers['content-type'])

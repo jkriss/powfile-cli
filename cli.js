@@ -17,6 +17,9 @@ const argv = require('yargs')
     alias: 'd',
     description: 'The output directory'
   })
+  .option('--no-unzip', {
+    description: `Don't unzip the main payload`
+  })
   .argv
 
 const run = async() => {
@@ -26,7 +29,9 @@ const run = async() => {
     fs.writeFile(argv.output, png)
   } else if (argv._[0] === 'extract') {
     // powfile extract floppy-with-data.png -d test-extract
-    extract({ image: argv.inputpng, dir: argv.dir })
+    // or
+    // powfile extract floppy-with-data.png -d test-extract --no-unzip
+    extract({ image: argv.inputpng, dir: argv.dir, unzip: argv.unzip })
   }
 }
 
