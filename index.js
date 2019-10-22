@@ -10,7 +10,8 @@ const create = async ({ image, files }) => {
   console.log('creating...')
   const imageData = await fs.readFile(image)
   const commonParentDir = commondir(process.cwd(), files)
-  const parentPrefix = path.relative(process.cwd(), commonParentDir)+path.sep
+  let parentPrefix = path.relative(process.cwd(), commonParentDir)
+  if (parentPrefix.length > 0) parentPrefix += path.sep
   const fileMap = {}
   
   // get *all* the files, recursively
