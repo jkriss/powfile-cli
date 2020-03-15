@@ -1,6 +1,6 @@
 {
   "name": "powfile-cli",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -15,7 +15,7 @@
     "glob-promise": "^3.4.0",
     "mime": "^2.4.4",
     "parse-raw-http": "0.0.1",
-    "powfile": "0.0.3",
+    "powfile": "0.0.4",
     "yargs": "^14.2.0"
   }
 }
